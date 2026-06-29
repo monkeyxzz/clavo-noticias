@@ -292,34 +292,12 @@ async function loadNews() {
 loadNews();
 
 /* ============================================================
-   2) WALL DE SHORTS  —  Shorts dominicanos (vertical 9:16). Autoplay muteado.
+   2) WALL DE SHORTS  —  el mismo Short en TODAS las celdas (vertical 9:16).
    ============================================================ */
-// Shorts curados (urbano/dembow/trap RD). Todos verificados embebibles
-// (playableInEmbed:true + sin bloqueo content-ID). Para cambiar uno: edita id + t.
-// El primero es el Short destacado que pidió el usuario.
-const SHORTS = [
-  { id: "Bis9DRV6obE", t: "#GAS" },
-  { id: "xFUyWsYO3Gw", t: "Rochy RD – La Calle Soy Yo (Dembow 2025)" },
-  { id: "mK7F6r854pE", t: "El Alfa le manda fuego a Anuel" },
-  { id: "9DvjRfysDqc", t: "Kiko El Crazy & Dahian El Apechao en cabina" },
-  { id: "xPnqB_VdDZw", t: "Tokischa x Bad Gyal x Young Miko – Chulo Rmx" },
-  { id: "U9Krl3bUNzA", t: "Chimbala inventa un dembow en concierto" },
-  { id: "AvBI6HQbFwY", t: "Yomel El Meloso – Freestyle" },
-  { id: "twKz18CI9p8", t: "Rochy RD En Vivo – Dembow, Luces y Perreo" },
-  { id: "7uEYTmVgNDY", t: "El Alfa feat. Chimbala en sus inicios" },
-  { id: "oXqc3g8mnIs", t: "Rochy RD – Locotron Remix" },
-  { id: "eh4-NLi3Zg4", t: "Kiko El Crazy rompe la cabina de Alofoke" },
-  { id: "rYUUaeQxgmA", t: "Rosalía y Tokischa – Dembow (detrás de cámara)" },
-  { id: "oAAA3tqqqkE", t: "Chimbala crea dembow \"Yo soy español\"" },
-  { id: "7_-I8P-Rt80", t: "Tokischa #dembow" },
-  { id: "vabK3LuF1b4", t: "El Alfa en su pasola – Las Terrenas 2025" },
-  { id: "ngCHM1mxvuI", t: "Nuevo baile dembow dominicano" },
-  { id: "iYBaQOt-xoo", t: "Kiko El Crazy en la alfombra (outfit)" },
-  { id: "SLOqgX5KMfc", t: "Competencia de baile dembow" },
-  { id: "hqcLlv-3bPs", t: "Yomel El Meloso ya está en España" },
-  { id: "H2hPVVsj89g", t: "Perreo dembow viral RD" },
-];
-const COUNT = SHORTS.length;
+// Short que pidió el usuario, repetido en todo el wall. Verificado embebible.
+// Para cambiarlo: edita id (parte después de /shorts/) + t (título para hover).
+const SHORT = { id: "Bis9DRV6obE", t: "#GAS" };
+const COUNT = 20;   // nº de celdas (todas el mismo Short)
 
 let VIDEO_IDS = [];
 let VIDEO_TITLES = [];
@@ -328,8 +306,8 @@ const $ = (id) => document.getElementById(id);
 const setStatus = (t) => { $("status").textContent = t; };
 
 async function initWall() {
-  VIDEO_IDS = SHORTS.map((v) => v.id).slice(0, COUNT);
-  VIDEO_TITLES = SHORTS.map((v) => v.t).slice(0, COUNT);
+  VIDEO_IDS = Array.from({ length: COUNT }, () => SHORT.id);
+  VIDEO_TITLES = Array.from({ length: COUNT }, () => SHORT.t);
 
   const grid = $("grid");
   grid.innerHTML = "";
