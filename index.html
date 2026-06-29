@@ -292,32 +292,57 @@ async function loadNews() {
 loadNews();
 
 /* ============================================================
-   2) VIDEO WALL  —  20 reproductores YouTube, autoplay muteado
+   2) VIDEO WALL  —  Top 20 videos musicales de RD (YouTube Data API),
+      con fallback. Autoplay muteado.
    ============================================================ */
 const COUNT = 20;
+// Respaldo si /api/topvideos aún no tiene YOUTUBE_API_KEY configurada:
 const POOL = [
   "aqz-KE-bpKQ", "M7lc1UVf-VE", "jNQXAC9IVRw", "_OBlgSz8sSM",
   "gWw23EYM9VM", "YE7VzlLtp-4", "ScMzIvxBSi4", "1La4QzGeaaQ",
   "tgbNymZ7vqY", "ktvTqknDobU"
 ];
-const VIDEO_IDS = Array.from({ length: COUNT }, (_, i) => POOL[i % POOL.length]);
 
+let VIDEO_IDS = [];
+let VIDEO_TITLES = [];
 const players = [];
 const $ = (id) => document.getElementById(id);
 const setStatus = (t) => { $("status").textContent = t; };
 
-const grid = $("grid");
-VIDEO_IDS.forEach((_, i) => {
-  const cell = document.createElement("div");
-  cell.className = "cell";
-  cell.innerHTML = `<span class="badge">${String(i + 1).padStart(2, "0")}</span>
-                    <div id="player-${i}"></div>`;
-  grid.appendChild(cell);
-});
+/* Pide el top RD; si no hay key/falla, usa el POOL de respaldo */
+async function resolveVideos() {
+  try {
+    const r = await fetch("/api/topvideos", { headers: { Accept: "application/json" } });
+    const d = await r.json();
+    if (d.videos && d.videos.length) {
+      VIDEO_IDS = d.videos.map((v) => v.id).slice(0, COUNT);
+      VIDEO_TITLES = d.videos.map((v) => v.title || "").slice(0, COUNT);
+      return;
+    }
+  } catch (e) { /* fallback abajo */ }
+  VIDEO_IDS = Array.from({ length: COUNT }, (_, i) => POOL[i % POOL.length]);
+  VIDEO_TITLES = VIDEO_IDS.map(() => "");
+}
 
-const tag = document.createElement("script");
-tag.src = "https://www.youtube.com/iframe_api";
-document.head.appendChild(tag);
+async function initWall() {
+  setStatus("Cargando top RD…");
+  await resolveVideos();
+
+  const grid = $("grid");
+  grid.innerHTML = "";
+  VIDEO_IDS.forEach((_, i) => {
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    if (VIDEO_TITLES[i]) cell.title = VIDEO_TITLES[i];
+    cell.innerHTML = `<span class="badge">${String(i + 1).padStart(2, "0")}</span>
+                      <div id="player-${i}"></div>`;
+    grid.appendChild(cell);
+  });
+
+  const tag = document.createElement("script");
+  tag.src = "https://www.youtube.com/iframe_api";
+  document.head.appendChild(tag);
+}
 
 window.onYouTubeIframeAPIReady = function () {
   setStatus("Creando reproductores…");
@@ -353,6 +378,8 @@ $("btnUnmute").addEventListener("click", () => {
   if (players[0]) { players[0].unMute(); players[0].setVolume(100); }
   setStatus("Sonido en video 01");
 });
+
+initWall();   // arranca: resuelve top RD → construye grid → carga la IFrame API
 </script>
 </body>
 </html>
