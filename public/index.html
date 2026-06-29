@@ -340,12 +340,11 @@ window.onYouTubeIframeAPIReady = function () {
     players[i] = new YT.Player(`player-${i}`, {
       videoId: it.videoId,
       playerVars: {
-        autoplay: 1, mute: 1, controls: 1, rel: 0, playsinline: 1, modestbranding: 1
-      },
-      events: { onReady: (e) => { e.target.mute(); e.target.playVideo(); } }
+        autoplay: 0, controls: 1, rel: 0, playsinline: 1, modestbranding: 1
+      }
     });
   });
-  setStatus("Auto-reproduciendo (muteado)");
+  setStatus("Listo · dale ▶ a cada video o «Iniciar todos»");
   ["btnStart", "btnPause", "btnMute", "btnUnmute"].forEach((b) => ($(b).disabled = false));
 };
 
@@ -357,9 +356,9 @@ $("btnStart").addEventListener("click", () => {
   setStatus("Iniciando…");
   players.forEach((p, i) => {
     if (!p || typeof p.playVideo !== "function") return;
-    setTimeout(() => { p.mute(); p.playVideo(); }, i * 40);
+    setTimeout(() => p.playVideo(), i * 40);
   });
-  setTimeout(() => setStatus("Reproduciendo (muteado)"), players.length * 40);
+  setTimeout(() => setStatus("Reproduciendo"), players.length * 40);
 });
 $("btnPause").addEventListener("click", () => { forEachPlayer((p) => p.pauseVideo()); setStatus("Pausado"); });
 $("btnMute").addEventListener("click", () => { forEachPlayer((p) => p.mute()); setStatus("Silenciado"); });
