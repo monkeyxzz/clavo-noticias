@@ -3,6 +3,8 @@
   "main": "src/index.js",
   "compatibility_date": "2026-06-29",
   "compatibility_flags": ["nodejs_compat"],
+  // no borrar vars/secrets del dashboard (ej. ADMIN_PASSWORD) en cada deploy
+  "keep_vars": true,
   "assets": {
     "directory": "./public",
     "binding": "ASSETS"
