@@ -296,11 +296,30 @@ loadNews();
       con fallback. Autoplay muteado.
    ============================================================ */
 const COUNT = 20;
-// Respaldo si /api/topvideos aún no tiene YOUTUBE_API_KEY configurada:
-const POOL = [
-  "aqz-KE-bpKQ", "M7lc1UVf-VE", "jNQXAC9IVRw", "_OBlgSz8sSM",
-  "gWw23EYM9VM", "YE7VzlLtp-4", "ScMzIvxBSi4", "1La4QzGeaaQ",
-  "tgbNymZ7vqY", "ktvTqknDobU"
+// Respaldo: 20 hits dominicanos curados (urbano/dembow/trap).
+// Se usan cuando /api/topvideos aún no tiene YOUTUBE_API_KEY configurada.
+// Todos verificados embebibles (oEmbed 200). Para cambiar uno: edita id + t.
+const FALLBACK = [
+  { id: "s5yRZOQ3EWI", t: "El Alfa – La Mamá de la Mamá" },
+  { id: "IAOUTc5jQb8", t: "Rochy RD – El Bloke Prendió" },
+  { id: "WCisFFHDVOI", t: "Chimbala, Justin Quiles, Zion & Lennox – Loco" },
+  { id: "7IFLfGLbTxo", t: "Tokischa & La Más Doll – MUXAXA" },
+  { id: "YpoUzo-CflQ", t: "Yailin La Más Viral – Bing Bong" },
+  { id: "sSMlsMj677E", t: "Ceky Viciny x La Perversa – De Show" },
+  { id: "uYXk2KB5z-8", t: "Kiko El Crazy, Fanta Rosario – Shake" },
+  { id: "iQWCkTYxrTc", t: "Químico Ultra Mega – Santos" },
+  { id: "J0W3Hw94ShA", t: "La Perversa x Ronny GTA – Prende" },
+  { id: "X-p5N9c-QIM", t: "Braulio Fogón x La Greña – La Tana" },
+  { id: "KCMlSdMjqDQ", t: "Haraca Kiko – Los Bobo Son Mío" },
+  { id: "RId0oXZI0u8", t: "Mozart La Para – Levántate" },
+  { id: "mvHzpuRBxJY", t: "Secreto El Famoso Biberón – Real Guerrero" },
+  { id: "PprWKfn6zDc", t: "Shadow Blow – Oh Oh" },
+  { id: "QvHdbT8HDJk", t: "Vakero – Te Quiero" },
+  { id: "2NmEUVxtGEw", t: "Musicólogo Y Menes, Carnal – Tu Mi Luna" },
+  { id: "FsziwbA8hVU", t: "Lápiz Conciente – Quieren Soñar" },
+  { id: "Z46h0HZ2Feo", t: "La Más Doll x Nfasis – El Baile Del Esqueleto" },
+  { id: "ZfQ3n5Dx47Q", t: "Liro Shaq El Sofoke – Pin Pon" },
+  { id: "OYM2RK5lW2Y", t: "Amenazzy – Difícil de Reemplazar" },
 ];
 
 let VIDEO_IDS = [];
@@ -320,8 +339,8 @@ async function resolveVideos() {
       return;
     }
   } catch (e) { /* fallback abajo */ }
-  VIDEO_IDS = Array.from({ length: COUNT }, (_, i) => POOL[i % POOL.length]);
-  VIDEO_TITLES = VIDEO_IDS.map(() => "");
+  VIDEO_IDS = FALLBACK.map((v) => v.id).slice(0, COUNT);
+  VIDEO_TITLES = FALLBACK.map((v) => v.t).slice(0, COUNT);
 }
 
 async function initWall() {
