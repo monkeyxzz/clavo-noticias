@@ -1,0 +1,10 @@
+{
+  "name": "clavo-noticias",
+  "main": "src/index.js",
+  "compatibility_date": "2026-06-29",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  }
+}

@@ -1,43 +1,59 @@
 # Clavo Records · Noticias urbanas
 
 Página de **noticias.clavorecords.com**: titulares **en vivo** de música urbana
-(reggaetón / dembow / trap / Latin) arriba, y un **video wall** de 20 reproductores
-de YouTube (autoplay muteado, API IFrame oficial) debajo.
+(reggaetón / dembow / trap / Latin) arriba, y un **video wall** con el Top 20 de
+videos musicales de RD (YouTube, autoplay muteado) debajo.
 
-- `index.html` — frontend (hero + copy, cards de noticias, video wall). Estética Clavo (oro/negro, Cinzel).
-- `functions/api/news.js` — Cloudflare Pages Function. Junta varios feeds RSS urbanos,
-  los parsea sin librerías y devuelve JSON en `GET /api/news`. Sin API key.
+Desplegado como **Cloudflare Worker con static assets** (proyecto `clavo-noticias`,
+deploy `npx wrangler deploy`).
 
-## `/api/news`
+## Estructura
 
-Devuelve `{ items: [ { title, url, source, date, image } ], updated }`.
+```
+public/index.html        ← frontend (hero+copy, cards de noticias, video wall)
+src/index.js             ← Worker entry: sirve assets + enruta /api/*
+functions/api/news.js    ← lógica de /api/news (feeds RSS urbanos → JSON)
+functions/api/topvideos.js ← lógica de /api/topvideos (YouTube Data API, top RD)
+wrangler.jsonc           ← config del Worker (main + assets binding ASSETS)
+```
 
-- **Fuentes:** array `FEEDS` arriba de `functions/api/news.js`. Hoy: Electro Wow (reggaetón),
-  Billboard Latin, Latin Heat, Remezcla. Añadir/quitar = editar ese array (`url` + `source`).
-  Verifica que la URL responda XML antes de fijarla (algunos feeds redirigen o están muertos).
-- **Balance:** `PER_SOURCE` (4) limita cuántos items aporta cada feed → mezcla, no domina uno.
-- **Tolerante a fallos:** cada feed es independiente; si uno cae se ignora. Si caen todos → `items: []`
-  y el frontend muestra estado vacío (nunca error roto).
-- **Caché:** edge ~30 min (`CACHE_SECONDS`) para no golpear los feeds en cada visita.
+`src/index.js` reutiliza las funciones `functions/api/*.js` (formato Pages `onRequest`)
+pasándoles `{ request, env, waitUntil }`. Así el mismo código sirve para Worker o Pages.
 
-## Editar el video wall
-- IDs de video → array `POOL` y `COUNT` en el `<script>` de `index.html`.
-- Columnas del grid → variable CSS `--cols`.
+## Rutas API
+
+- **`GET /api/news`** → `{ items:[{title,url,source,date,image}], updated }`.
+  Junta feeds RSS urbanos (Electro Wow reggaetón, Billboard Latin, Latin Heat, Remezcla),
+  parsea sin librerías, cap `PER_SOURCE` por fuente, cache edge 30 min. Sin API key.
+- **`GET /api/topvideos`** → `{ videos:[{id,title}], note }`.
+  Top videos musicales de RD vía YouTube Data API (`chart=mostPopular, regionCode=DO,
+  videoCategoryId=10`). Requiere la var **`YOUTUBE_API_KEY`**. Sin key → `note:"no-key"`
+  y el wall usa la lista fija dominicana de respaldo (`FALLBACK` en index.html).
+
+## Variables de entorno
+
+- **`YOUTUBE_API_KEY`** (secret) — key gratis de YouTube Data API v3.
+  Cloudflare: proyecto `clavo-noticias` → Settings → Variables and secrets → Add → redeploy.
+
+## Editar
+
+- Feeds de noticias → array `FEEDS` en `functions/api/news.js`.
+- Lista fija del wall (respaldo) → array `FALLBACK` en `public/index.html` (id + título).
+  Verifica que el video sea embebible: `playableInEmbed:true` y sin bloqueo de content-ID
+  (algunos sellos, p.ej. LatinAutor-UMPG, bloquean reproducción en sitios externos).
+- Región del top → `REGION` en `functions/api/topvideos.js`.
 
 ## Local
 
-Con Functions (recomendado, para probar `/api/news`):
-
 ```bash
-npx wrangler pages dev . --compatibility-date=2026-06-01 --port 8788
-# abrir http://localhost:8788
+npx wrangler dev --port 8790
+# abrir http://localhost:8790
 ```
 
-Solo estático (sin noticias): `python -m http.server 8080`.
-La API de YouTube **no** funciona con `file://` (error 153 / origen null) — sirve por HTTP.
+Sirve assets + ambas rutas API. La API de YouTube **no** funciona con `file://`
+(error 153 / origen null). Autoplay solo muteado (regla del navegador).
 
-## Deploy (Cloudflare Pages)
-- Framework preset: **None**
-- Build command: *(vacío)*
-- Build output directory: `/`
-- La carpeta `functions/` se detecta sola (Pages Functions) — no requiere build ni dependencias.
+## Deploy
+
+Cloudflare Workers Builds (repo conectado): Build command vacío, Deploy `npx wrangler deploy`.
+Cada `git push` a `main` redespliega. Luego: Custom domains → `noticias.clavorecords.com`.
