@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Video Wall · 20 reproductores YouTube</title>
+<style>
+  :root {
+    --cols: 5;            /* columnas del grid (5 x 4 = 20) */
+    --gap: 6px;
+    --bg: #0b0d10;
+    --panel: #15191f;
+    --accent: #1db954;
+    --text: #e7ecf2;
+    --muted: #8a93a0;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 10px 14px;
+    background: var(--panel);
+    border-bottom: 1px solid #000;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  header h1 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+    margin-right: auto;
+    letter-spacing: .3px;
+  }
+
+  header h1 .dim { color: var(--muted); font-weight: 400; }
+
+  button {
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    background: #222831;
+    border: 1px solid #2f3742;
+    border-radius: 7px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background .12s, border-color .12s;
+  }
+  button:hover { background: #2a323d; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #04130a; }
+  button.primary:hover { filter: brightness(1.08); }
+  button:disabled { opacity: .4; cursor: not-allowed; }
+
+  .status { font-size: 12px; color: var(--muted); min-width: 120px; }
+
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), 1fr);
+    gap: var(--gap);
+    padding: var(--gap);
+  }
+
+  .cell {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .cell iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+  .cell .badge {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    z-index: 2;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(0,0,0,.55);
+    padding: 1px 6px;
+    border-radius: 4px;
+    pointer-events: none;
+  }
+
+  @media (max-width: 1100px) { :root { --cols: 4; } }
+  @media (max-width: 760px)  { :root { --cols: 3; } }
+  @media (max-width: 520px)  { :root { --cols: 2; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Video Wall <span class="dim">· 20 reproductores</span></h1>
+  <span class="status" id="status">Cargando API…</span>
+  <button class="primary" id="btnStart" disabled>▶ Iniciar todos</button>
+  <button id="btnPause" disabled>⏸ Pausar todos</button>
+  <button id="btnMute" disabled>🔇 Silenciar</button>
+  <button id="btnUnmute" disabled>🔊 Sonido</button>
+</header>
+
+<div id="grid"></div>
+
+<script>
+/* ============================================================
+   CONFIG
+   COUNT  = cuántas celdas (100).
+   POOL   = IDs de video embebibles; se ciclan para llenar COUNT.
+            Reemplaza por tus IDs (parte después de "watch?v=").
+   ============================================================ */
+const COUNT = 20;
+const POOL = [
+  "aqz-KE-bpKQ", "M7lc1UVf-VE", "jNQXAC9IVRw", "_OBlgSz8sSM",
+  "gWw23EYM9VM", "YE7VzlLtp-4", "ScMzIvxBSi4", "1La4QzGeaaQ",
+  "tgbNymZ7vqY", "ktvTqknDobU"
+];
+const VIDEO_IDS = Array.from({ length: COUNT }, (_, i) => POOL[i % POOL.length]);
+
+const players = [];     // instancias YT.Player
+let apiReady = false;
+
+const $ = (id) => document.getElementById(id);
+const setStatus = (t) => { $("status").textContent = t; };
+
+/* Construir el grid de 20 celdas con un <div> por player */
+const grid = $("grid");
+VIDEO_IDS.forEach((_, i) => {
+  const cell = document.createElement("div");
+  cell.className = "cell";
+  cell.innerHTML = `<span class="badge">${String(i + 1).padStart(2, "0")}</span>
+                    <div id="player-${i}"></div>`;
+  grid.appendChild(cell);
+});
+
+/* Cargar la IFrame Player API de YouTube */
+const tag = document.createElement("script");
+tag.src = "https://www.youtube.com/iframe_api";
+document.head.appendChild(tag);
+
+/* Callback global que YouTube invoca cuando la API está lista */
+window.onYouTubeIframeAPIReady = function () {
+  apiReady = true;
+  setStatus("Creando reproductores…");
+
+  VIDEO_IDS.forEach((id, i) => {
+    players[i] = new YT.Player(`player-${i}`, {
+      videoId: id,
+      playerVars: {
+        autoplay: 1,        // auto-reproduce al cargar (solo funciona muteado)
+        mute: 1,            // muteado: requisito del navegador para autoplay
+        controls: 1,
+        rel: 0,
+        playsinline: 1,
+        modestbranding: 1
+      },
+      events: {
+        // refuerzo: si autoplay no dispara, forzamos play al estar listo
+        onReady: (e) => { e.target.mute(); e.target.playVideo(); }
+      }
+    });
+  });
+
+  setStatus("Auto-reproduciendo (muteado)");
+  ["btnStart", "btnPause", "btnMute", "btnUnmute"].forEach((b) => ($(b).disabled = false));
+};
+
+/* Helper: aplicar acción a todos los players que ya estén listos */
+function forEachPlayer(fn) {
+  players.forEach((p) => { if (p && typeof p.playVideo === "function") fn(p); });
+}
+
+/* Un click dispara los 100, escalonados ~40ms para no saturar de golpe */
+$("btnStart").addEventListener("click", () => {
+  setStatus("Iniciando…");
+  players.forEach((p, i) => {
+    if (!p || typeof p.playVideo !== "function") return;
+    setTimeout(() => { p.mute(); p.playVideo(); }, i * 40);
+  });
+  setTimeout(() => setStatus("Reproduciendo (muteado)"), players.length * 40);
+});
+
+$("btnPause").addEventListener("click", () => {
+  forEachPlayer((p) => p.pauseVideo());
+  setStatus("Pausado");
+});
+
+$("btnMute").addEventListener("click", () => {
+  forEachPlayer((p) => p.mute());
+  setStatus("Silenciado");
+});
+
+/* Sonido en TODOS suena horrible; quita el comentario si lo quieres así.
+   Por defecto: activa sonido solo en el primer player (el activo). */
+$("btnUnmute").addEventListener("click", () => {
+  forEachPlayer((p) => p.mute());          // resto en silencio
+  if (players[0]) { players[0].unMute(); players[0].setVolume(100); }
+  setStatus("Sonido en video 01");
+});
+</script>
+</body>
+</html>
