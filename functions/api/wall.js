@@ -31,9 +31,32 @@ async function getWall(env) {
 }
 
 function defaultConfig() {
-  // Se usa solo si KV está vacío: el Short que había hardcodeado.
+  // Se usa solo si KV está vacío: 20 shorts dominicanos curados (verificados
+  // embebibles). En cuanto guardas tu lista desde /admin, esta deja de usarse.
+  const s = (videoId, title) => ({ type: "short", videoId, title });
   return {
-    items: [{ type: "short", videoId: "Bis9DRV6obE", title: "#GAS" }],
+    items: [
+      s("Bis9DRV6obE", "#GAS"),
+      s("xFUyWsYO3Gw", "Rochy RD – La Calle Soy Yo"),
+      s("mK7F6r854pE", "El Alfa le manda fuego a Anuel"),
+      s("9DvjRfysDqc", "Kiko El Crazy & Dahian El Apechao"),
+      s("xPnqB_VdDZw", "Tokischa x Bad Gyal x Young Miko – Chulo Rmx"),
+      s("U9Krl3bUNzA", "Chimbala inventa un dembow"),
+      s("AvBI6HQbFwY", "Yomel El Meloso – Freestyle"),
+      s("twKz18CI9p8", "Rochy RD En Vivo"),
+      s("7uEYTmVgNDY", "El Alfa feat. Chimbala"),
+      s("oXqc3g8mnIs", "Rochy RD – Locotron Remix"),
+      s("eh4-NLi3Zg4", "Kiko El Crazy rompe la cabina"),
+      s("rYUUaeQxgmA", "Rosalía y Tokischa – Dembow"),
+      s("oAAA3tqqqkE", "Chimbala – Yo soy español"),
+      s("7_-I8P-Rt80", "Tokischa #dembow"),
+      s("vabK3LuF1b4", "El Alfa en su pasola"),
+      s("ngCHM1mxvuI", "Nuevo baile dembow dominicano"),
+      s("iYBaQOt-xoo", "Kiko El Crazy en la alfombra"),
+      s("SLOqgX5KMfc", "Competencia de baile dembow"),
+      s("hqcLlv-3bPs", "Yomel El Meloso en España"),
+      s("H2hPVVsj89g", "Perreo dembow viral RD"),
+    ],
     updatedAt: null,
     isDefault: true,
   };
