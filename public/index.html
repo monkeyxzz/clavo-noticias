@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --cols: 5;               /* columnas del video wall (5 x 4 = 20) */
+    --cols: 6;               /* columnas del wall de Shorts (celdas verticales) */
     --gap: 6px;
     --gold: #c9a24a;
     --gold-dim: #8a6f33;
@@ -146,7 +146,7 @@
 
   /* ── Video wall ── */
   #grid { display: grid; grid-template-columns: repeat(var(--cols), 1fr); gap: var(--gap); }
-  .cell { position: relative; aspect-ratio: 16 / 9; background: #000; border-radius: 6px; overflow: hidden; }
+  .cell { position: relative; aspect-ratio: 9 / 16; background: #000; border-radius: 8px; overflow: hidden; }
   .cell iframe { width: 100%; height: 100%; border: 0; display: block; }
   .cell .badge {
     position: absolute; top: 4px; left: 4px; z-index: 2; font-size: 11px; font-weight: 700;
@@ -161,9 +161,9 @@
   footer a { color: var(--gold-dim); }
   footer a:hover { color: var(--gold); }
 
-  @media (max-width: 1100px) { :root { --cols: 4; } }
-  @media (max-width: 760px)  { :root { --cols: 3; } .hero { padding: 34px 0 22px; } }
-  @media (max-width: 520px)  { :root { --cols: 2; } }
+  @media (max-width: 1100px) { :root { --cols: 5; } }
+  @media (max-width: 760px)  { :root { --cols: 4; } .hero { padding: 34px 0 22px; } }
+  @media (max-width: 520px)  { :root { --cols: 3; } }
 </style>
 </head>
 <body>
@@ -196,7 +196,7 @@
   <!-- VIDEO WALL -->
   <section class="block" id="wall">
     <div class="sec-head">
-      <h2>Video Wall · lo más sonado</h2>
+      <h2>Shorts · lo más viral RD</h2>
       <span class="rule"></span>
     </div>
     <div class="wall-controls">
@@ -292,35 +292,34 @@ async function loadNews() {
 loadNews();
 
 /* ============================================================
-   2) VIDEO WALL  —  Top 20 videos musicales de RD (YouTube Data API),
-      con fallback. Autoplay muteado.
+   2) WALL DE SHORTS  —  Shorts dominicanos (vertical 9:16). Autoplay muteado.
    ============================================================ */
-const COUNT = 20;
-// Respaldo: 20 hits dominicanos curados (urbano/dembow/trap).
-// Se usan cuando /api/topvideos aún no tiene YOUTUBE_API_KEY configurada.
-// Todos verificados embebibles (oEmbed 200). Para cambiar uno: edita id + t.
-const FALLBACK = [
-  { id: "s5yRZOQ3EWI", t: "El Alfa – La Mamá de la Mamá" },
-  { id: "IAOUTc5jQb8", t: "Rochy RD – El Bloke Prendió" },
-  { id: "WCisFFHDVOI", t: "Chimbala, Justin Quiles, Zion & Lennox – Loco" },
-  { id: "7IFLfGLbTxo", t: "Tokischa & La Más Doll – MUXAXA" },
-  { id: "jcAqAJgeYwM", t: "La Materialista – La Chapa Que Vibran" },
-  { id: "sSMlsMj677E", t: "Ceky Viciny x La Perversa – De Show" },
-  { id: "uYXk2KB5z-8", t: "Kiko El Crazy, Fanta Rosario – Shake" },
-  { id: "iQWCkTYxrTc", t: "Químico Ultra Mega – Santos" },
-  { id: "J0W3Hw94ShA", t: "La Perversa x Ronny GTA – Prende" },
-  { id: "X-p5N9c-QIM", t: "Braulio Fogón x La Greña – La Tana" },
-  { id: "Y67THXGWs1U", t: "Dixson Waz – Toco Toco To" },
-  { id: "RId0oXZI0u8", t: "Mozart La Para – Levántate" },
-  { id: "mvHzpuRBxJY", t: "Secreto El Famoso Biberón – Real Guerrero" },
-  { id: "PprWKfn6zDc", t: "Shadow Blow – Oh Oh" },
-  { id: "QvHdbT8HDJk", t: "Vakero – Te Quiero" },
-  { id: "2NmEUVxtGEw", t: "Musicólogo Y Menes, Carnal – Tu Mi Luna" },
-  { id: "FsziwbA8hVU", t: "Lápiz Conciente – Quieren Soñar" },
-  { id: "Z46h0HZ2Feo", t: "La Más Doll x Nfasis – El Baile Del Esqueleto" },
-  { id: "ZfQ3n5Dx47Q", t: "Liro Shaq El Sofoke – Pin Pon" },
-  { id: "OYM2RK5lW2Y", t: "Amenazzy – Difícil de Reemplazar" },
+// Shorts curados (urbano/dembow/trap RD). Todos verificados embebibles
+// (playableInEmbed:true + sin bloqueo content-ID). Para cambiar uno: edita id + t.
+// El primero es el Short destacado que pidió el usuario.
+const SHORTS = [
+  { id: "Bis9DRV6obE", t: "#GAS" },
+  { id: "xFUyWsYO3Gw", t: "Rochy RD – La Calle Soy Yo (Dembow 2025)" },
+  { id: "mK7F6r854pE", t: "El Alfa le manda fuego a Anuel" },
+  { id: "9DvjRfysDqc", t: "Kiko El Crazy & Dahian El Apechao en cabina" },
+  { id: "xPnqB_VdDZw", t: "Tokischa x Bad Gyal x Young Miko – Chulo Rmx" },
+  { id: "U9Krl3bUNzA", t: "Chimbala inventa un dembow en concierto" },
+  { id: "AvBI6HQbFwY", t: "Yomel El Meloso – Freestyle" },
+  { id: "twKz18CI9p8", t: "Rochy RD En Vivo – Dembow, Luces y Perreo" },
+  { id: "7uEYTmVgNDY", t: "El Alfa feat. Chimbala en sus inicios" },
+  { id: "oXqc3g8mnIs", t: "Rochy RD – Locotron Remix" },
+  { id: "eh4-NLi3Zg4", t: "Kiko El Crazy rompe la cabina de Alofoke" },
+  { id: "rYUUaeQxgmA", t: "Rosalía y Tokischa – Dembow (detrás de cámara)" },
+  { id: "oAAA3tqqqkE", t: "Chimbala crea dembow \"Yo soy español\"" },
+  { id: "7_-I8P-Rt80", t: "Tokischa #dembow" },
+  { id: "vabK3LuF1b4", t: "El Alfa en su pasola – Las Terrenas 2025" },
+  { id: "ngCHM1mxvuI", t: "Nuevo baile dembow dominicano" },
+  { id: "iYBaQOt-xoo", t: "Kiko El Crazy en la alfombra (outfit)" },
+  { id: "SLOqgX5KMfc", t: "Competencia de baile dembow" },
+  { id: "hqcLlv-3bPs", t: "Yomel El Meloso ya está en España" },
+  { id: "H2hPVVsj89g", t: "Perreo dembow viral RD" },
 ];
+const COUNT = SHORTS.length;
 
 let VIDEO_IDS = [];
 let VIDEO_TITLES = [];
@@ -328,24 +327,9 @@ const players = [];
 const $ = (id) => document.getElementById(id);
 const setStatus = (t) => { $("status").textContent = t; };
 
-/* Pide el top RD; si no hay key/falla, usa el POOL de respaldo */
-async function resolveVideos() {
-  try {
-    const r = await fetch("/api/topvideos", { headers: { Accept: "application/json" } });
-    const d = await r.json();
-    if (d.videos && d.videos.length) {
-      VIDEO_IDS = d.videos.map((v) => v.id).slice(0, COUNT);
-      VIDEO_TITLES = d.videos.map((v) => v.title || "").slice(0, COUNT);
-      return;
-    }
-  } catch (e) { /* fallback abajo */ }
-  VIDEO_IDS = FALLBACK.map((v) => v.id).slice(0, COUNT);
-  VIDEO_TITLES = FALLBACK.map((v) => v.t).slice(0, COUNT);
-}
-
 async function initWall() {
-  setStatus("Cargando top RD…");
-  await resolveVideos();
+  VIDEO_IDS = SHORTS.map((v) => v.id).slice(0, COUNT);
+  VIDEO_TITLES = SHORTS.map((v) => v.t).slice(0, COUNT);
 
   const grid = $("grid");
   grid.innerHTML = "";
