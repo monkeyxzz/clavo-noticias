@@ -144,14 +144,20 @@
   button.primary:hover { filter: brightness(1.08); }
   button:disabled { opacity: .4; cursor: not-allowed; }
 
-  /* ── Video wall ── */
-  #grid { display: grid; grid-template-columns: repeat(var(--cols), 1fr); gap: var(--gap); }
-  .cell { position: relative; aspect-ratio: 9 / 16; background: #000; border-radius: 8px; overflow: hidden; }
+  /* ── Wall (masonry por columnas: mezcla shorts 9:16 + videos/lives 16:9) ── */
+  #grid { column-width: 240px; column-gap: var(--gap); }
+  .cell { position: relative; break-inside: avoid; margin: 0 0 var(--gap);
+    background: #000; border-radius: 8px; overflow: hidden; }
+  .cell.short { aspect-ratio: 9 / 16; }
+  .cell.video { aspect-ratio: 16 / 9; }
   .cell iframe { width: 100%; height: 100%; border: 0; display: block; }
   .cell .badge {
-    position: absolute; top: 4px; left: 4px; z-index: 2; font-size: 11px; font-weight: 700;
-    color: #fff; background: rgba(0,0,0,.55); padding: 1px 6px; border-radius: 4px; pointer-events: none;
+    position: absolute; top: 4px; left: 4px; z-index: 2; font-size: 10px; font-weight: 700;
+    letter-spacing: .4px; color: #fff; background: rgba(0,0,0,.6); padding: 2px 7px;
+    border-radius: 4px; pointer-events: none;
   }
+  .cell .badge.live { color: #ff5252; }
+  .cell .badge.short { color: var(--gold); }
 
   /* ── Footer ── */
   footer {
@@ -161,9 +167,8 @@
   footer a { color: var(--gold-dim); }
   footer a:hover { color: var(--gold); }
 
-  @media (max-width: 1100px) { :root { --cols: 5; } }
-  @media (max-width: 760px)  { :root { --cols: 4; } .hero { padding: 34px 0 22px; } }
-  @media (max-width: 520px)  { :root { --cols: 3; } }
+  @media (max-width: 760px) { .hero { padding: 34px 0 22px; } }
+  @media (max-width: 520px) { #grid { column-width: 150px; } }
 </style>
 </head>
 <body>
@@ -292,30 +297,34 @@ async function loadNews() {
 loadNews();
 
 /* ============================================================
-   2) WALL DE SHORTS  —  el mismo Short en TODAS las celdas (vertical 9:16).
+   2) WALL  —  videos editables desde /api/wall (lives / musicales / shorts).
+      Layout masonry por tipo. Autoplay muteado. Editar contenido: /admin
    ============================================================ */
-// Short que pidió el usuario, repetido en todo el wall. Verificado embebible.
-// Para cambiarlo: edita id (parte después de /shorts/) + t (título para hover).
-const SHORT = { id: "Bis9DRV6obE", t: "#GAS" };
-const COUNT = 20;   // nº de celdas (todas el mismo Short)
-
-let VIDEO_IDS = [];
-let VIDEO_TITLES = [];
+const ITEMS = [];          // {type, videoId, title}
 const players = [];
 const $ = (id) => document.getElementById(id);
 const setStatus = (t) => { $("status").textContent = t; };
 
+const TYPE_BADGE = { live: "● EN VIVO", music: "♪", short: "Short" };
+
 async function initWall() {
-  VIDEO_IDS = Array.from({ length: COUNT }, () => SHORT.id);
-  VIDEO_TITLES = Array.from({ length: COUNT }, () => SHORT.t);
+  setStatus("Cargando videos…");
+  let items = [];
+  try {
+    const r = await fetch("/api/wall", { headers: { Accept: "application/json" } });
+    const d = await r.json();
+    if (Array.isArray(d.items)) items = d.items;
+  } catch (e) { /* default abajo */ }
+  if (!items.length) items = [{ type: "short", videoId: "Bis9DRV6obE", title: "#GAS" }];
+  ITEMS.push(...items);
 
   const grid = $("grid");
   grid.innerHTML = "";
-  VIDEO_IDS.forEach((_, i) => {
+  ITEMS.forEach((it, i) => {
     const cell = document.createElement("div");
-    cell.className = "cell";
-    if (VIDEO_TITLES[i]) cell.title = VIDEO_TITLES[i];
-    cell.innerHTML = `<span class="badge">${String(i + 1).padStart(2, "0")}</span>
+    cell.className = "cell " + (it.type === "short" ? "short" : "video");
+    if (it.title) cell.title = it.title;                    // property = no HTML inyectado
+    cell.innerHTML = `<span class="badge ${it.type}">${TYPE_BADGE[it.type] || ""}</span>
                       <div id="player-${i}"></div>`;
     grid.appendChild(cell);
   });
@@ -327,9 +336,9 @@ async function initWall() {
 
 window.onYouTubeIframeAPIReady = function () {
   setStatus("Creando reproductores…");
-  VIDEO_IDS.forEach((id, i) => {
+  ITEMS.forEach((it, i) => {
     players[i] = new YT.Player(`player-${i}`, {
-      videoId: id,
+      videoId: it.videoId,
       playerVars: {
         autoplay: 1, mute: 1, controls: 1, rel: 0, playsinline: 1, modestbranding: 1
       },

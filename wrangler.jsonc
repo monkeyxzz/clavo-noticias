@@ -7,6 +7,9 @@
     "directory": "./public",
     "binding": "ASSETS"
   },
+  "kv_namespaces": [
+    { "binding": "WALL_KV", "id": "81338d0d376b46a9865a550db3fa3d16" }
+  ],
   "routes": [
     { "pattern": "noticias.clavorecords.com", "custom_domain": true }
   ]

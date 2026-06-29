@@ -11,6 +11,8 @@
 
 import { onRequest as newsHandler } from "../functions/api/news.js";
 import { onRequest as topHandler } from "../functions/api/topvideos.js";
+import { onRequest as wallHandler } from "../functions/api/wall.js";
+import { onRequest as resolveHandler } from "../functions/api/resolve.js";
 
 export default {
   async fetch(request, env, ctx) {
@@ -19,8 +21,10 @@ export default {
 
     if (pathname === "/api/news") return newsHandler(context);
     if (pathname === "/api/topvideos") return topHandler(context);
+    if (pathname === "/api/wall") return wallHandler(context);
+    if (pathname === "/api/resolve") return resolveHandler(context);
 
-    // resto → assets estáticos (index.html, etc.)
+    // resto → assets estáticos (index.html, admin.html, etc.)
     return env.ASSETS.fetch(request);
   },
 };
