@@ -3,124 +3,296 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Video Wall · 20 reproductores YouTube</title>
+<title>Clavo Records · Noticias urbanas</title>
+<meta name="description" content="El pulso de la música urbana: titulares en vivo de reggaetón, dembow y trap, más el muro de los videos que mandan." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --cols: 5;            /* columnas del grid (5 x 4 = 20) */
+    --cols: 5;               /* columnas del video wall (5 x 4 = 20) */
     --gap: 6px;
-    --bg: #0b0d10;
-    --panel: #15191f;
-    --accent: #1db954;
-    --text: #e7ecf2;
-    --muted: #8a93a0;
+    --gold: #c9a24a;
+    --gold-dim: #8a6f33;
+    --bg: #0b0a08;
+    --panel: #15120c;
+    --panel-2: #1d1810;
+    --line: #2a2316;
+    --text: #ece6da;
+    --muted: #9a917f;
   }
 
   * { box-sizing: border-box; }
 
   html, body {
     margin: 0;
-    height: 100%;
     background: var(--bg);
     color: var(--text);
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
 
-  header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    padding: 10px 14px;
-    background: var(--panel);
-    border-bottom: 1px solid #000;
-    position: sticky;
-    top: 0;
-    z-index: 10;
+  a { color: inherit; text-decoration: none; }
+
+  .wrap { max-width: 1400px; margin: 0 auto; padding: 0 18px; }
+
+  /* ── Barra superior ── */
+  .topbar {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 18px;
+    background: rgba(11,10,8,.82);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  .brand {
+    font-family: "Cinzel", serif; font-weight: 700; font-size: 16px;
+    letter-spacing: 3px; color: var(--gold);
+  }
+  .topbar .spacer { margin-left: auto; }
+  .topbar a.ext { font-size: 12px; color: var(--muted); letter-spacing: .5px; }
+  .topbar a.ext:hover { color: var(--gold); }
+
+  /* ── Hero ── */
+  .hero { padding: 48px 0 30px; border-bottom: 1px solid var(--line); }
+  .eyebrow {
+    font-size: 12px; letter-spacing: 4px; color: var(--gold-dim);
+    text-transform: uppercase; font-weight: 600; margin-bottom: 14px;
+  }
+  .hero h1 {
+    font-family: "Cinzel", serif; font-weight: 700;
+    font-size: clamp(34px, 6vw, 64px); line-height: 1.02;
+    margin: 0 0 16px; color: var(--text);
+  }
+  .hero h1 .accent { color: var(--gold); }
+  .hero p.sub {
+    max-width: 620px; margin: 0; font-size: clamp(15px, 2.2vw, 19px);
+    line-height: 1.55; color: var(--muted);
   }
 
-  header h1 {
-    font-size: 15px;
-    font-weight: 600;
-    margin: 0;
-    margin-right: auto;
-    letter-spacing: .3px;
+  /* ── Secciones ── */
+  section.block { padding: 38px 0; }
+  .sec-head {
+    display: flex; align-items: baseline; gap: 14px; margin-bottom: 22px;
+  }
+  .sec-head h2 {
+    font-family: "Cinzel", serif; font-weight: 500; font-size: 22px;
+    letter-spacing: 1px; margin: 0; color: var(--text);
+  }
+  .sec-head .rule { flex: 1; height: 1px; background: var(--line); }
+  .sec-head .meta { font-size: 12px; color: var(--muted); }
+
+  /* ── Cards de noticias ── */
+  #news-grid {
+    display: grid; gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
+  }
+  .card {
+    display: flex; flex-direction: column;
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 12px; overflow: hidden;
+    transition: transform .15s ease, border-color .15s ease;
+  }
+  .card:hover { transform: translateY(-3px); border-color: var(--gold-dim); }
+  .card .thumb {
+    aspect-ratio: 16 / 9; background: linear-gradient(135deg, #1d1810, #0b0a08);
+    position: relative; overflow: hidden;
+  }
+  .card .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .card .thumb .ph {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    font-family: "Cinzel", serif; letter-spacing: 3px; font-size: 13px;
+    color: var(--gold-dim);
+  }
+  .card .body { padding: 13px 14px 16px; display: flex; flex-direction: column; gap: 9px; flex: 1; }
+  .card .kicker {
+    display: flex; gap: 8px; align-items: center;
+    font-size: 11px; letter-spacing: .6px; text-transform: uppercase; color: var(--gold-dim);
+  }
+  .card .kicker .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--muted); }
+  .card .kicker .time { color: var(--muted); }
+  .card h3 {
+    margin: 0; font-size: 15px; font-weight: 600; line-height: 1.35; color: var(--text);
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .card:hover h3 { color: var(--gold); }
+
+  /* skeleton */
+  .card.skel .thumb, .card.skel .ln {
+    background: linear-gradient(90deg, #15120c 25%, #221c12 37%, #15120c 63%);
+    background-size: 400% 100%; animation: shimmer 1.4s infinite;
+  }
+  .card.skel .ln { height: 11px; border-radius: 4px; }
+  .card.skel .ln.short { width: 55%; }
+  @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+  .empty {
+    border: 1px dashed var(--line); border-radius: 12px;
+    padding: 40px; text-align: center; color: var(--muted); font-size: 15px;
   }
 
-  header h1 .dim { color: var(--muted); font-weight: 400; }
-
+  /* ── Controles del wall ── */
+  .wall-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .wall-controls .status { font-size: 12px; color: var(--muted); margin-left: auto; }
   button {
-    font: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text);
-    background: #222831;
-    border: 1px solid #2f3742;
-    border-radius: 7px;
-    padding: 8px 14px;
-    cursor: pointer;
-    transition: background .12s, border-color .12s;
+    font: inherit; font-size: 13px; font-weight: 600; color: var(--text);
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px;
+    padding: 8px 14px; cursor: pointer; transition: background .12s, border-color .12s;
   }
-  button:hover { background: #2a323d; }
-  button.primary { background: var(--accent); border-color: var(--accent); color: #04130a; }
+  button:hover { border-color: var(--gold-dim); }
+  button.primary { background: var(--gold); border-color: var(--gold); color: #1a1407; }
   button.primary:hover { filter: brightness(1.08); }
   button:disabled { opacity: .4; cursor: not-allowed; }
 
-  .status { font-size: 12px; color: var(--muted); min-width: 120px; }
-
-  #grid {
-    display: grid;
-    grid-template-columns: repeat(var(--cols), 1fr);
-    gap: var(--gap);
-    padding: var(--gap);
-  }
-
-  .cell {
-    position: relative;
-    aspect-ratio: 16 / 9;
-    background: #000;
-    border-radius: 6px;
-    overflow: hidden;
-  }
+  /* ── Video wall ── */
+  #grid { display: grid; grid-template-columns: repeat(var(--cols), 1fr); gap: var(--gap); }
+  .cell { position: relative; aspect-ratio: 16 / 9; background: #000; border-radius: 6px; overflow: hidden; }
   .cell iframe { width: 100%; height: 100%; border: 0; display: block; }
-
   .cell .badge {
-    position: absolute;
-    top: 4px;
-    left: 4px;
-    z-index: 2;
-    font-size: 11px;
-    font-weight: 700;
-    color: #fff;
-    background: rgba(0,0,0,.55);
-    padding: 1px 6px;
-    border-radius: 4px;
-    pointer-events: none;
+    position: absolute; top: 4px; left: 4px; z-index: 2; font-size: 11px; font-weight: 700;
+    color: #fff; background: rgba(0,0,0,.55); padding: 1px 6px; border-radius: 4px; pointer-events: none;
   }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--line); margin-top: 30px;
+    padding: 26px 0 40px; font-size: 12px; color: var(--muted); text-align: center; line-height: 1.7;
+  }
+  footer a { color: var(--gold-dim); }
+  footer a:hover { color: var(--gold); }
 
   @media (max-width: 1100px) { :root { --cols: 4; } }
-  @media (max-width: 760px)  { :root { --cols: 3; } }
+  @media (max-width: 760px)  { :root { --cols: 3; } .hero { padding: 34px 0 22px; } }
   @media (max-width: 520px)  { :root { --cols: 2; } }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>Video Wall <span class="dim">· 20 reproductores</span></h1>
-  <span class="status" id="status">Cargando API…</span>
-  <button class="primary" id="btnStart" disabled>▶ Iniciar todos</button>
-  <button id="btnPause" disabled>⏸ Pausar todos</button>
-  <button id="btnMute" disabled>🔇 Silenciar</button>
-  <button id="btnUnmute" disabled>🔊 Sonido</button>
-</header>
+<div class="topbar">
+  <span class="brand">CLAVO&nbsp;RECORDS</span>
+  <span class="spacer"></span>
+  <a class="ext" href="https://clavorecords.com" target="_blank" rel="noopener">clavorecords.com ↗</a>
+</div>
 
-<div id="grid"></div>
+<div class="wrap">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="eyebrow">Clavo Records · Noticias</div>
+    <h1>El pulso de la<br /><span class="accent">música urbana</span></h1>
+    <p class="sub">Lo último del reggaetón, el dembow y el trap — titulares en vivo y los videos que mandan, en un solo muro.</p>
+  </header>
+
+  <!-- NOTICIAS -->
+  <section class="block" id="noticias">
+    <div class="sec-head">
+      <h2>Lo que suena ahora</h2>
+      <span class="rule"></span>
+      <span class="meta" id="news-meta"></span>
+    </div>
+    <div id="news-grid"></div>
+  </section>
+
+  <!-- VIDEO WALL -->
+  <section class="block" id="wall">
+    <div class="sec-head">
+      <h2>Video Wall · lo más sonado</h2>
+      <span class="rule"></span>
+    </div>
+    <div class="wall-controls">
+      <button class="primary" id="btnStart" disabled>▶ Iniciar todos</button>
+      <button id="btnPause" disabled>⏸ Pausar</button>
+      <button id="btnMute" disabled>🔇 Silenciar</button>
+      <button id="btnUnmute" disabled>🔊 Sonido</button>
+      <span class="status" id="status">Cargando API…</span>
+    </div>
+    <div id="grid"></div>
+  </section>
+
+</div>
+
+<footer>
+  © Clavo Records · Titulares vía fuentes externas, actualizados cada ~30&nbsp;min<br />
+  <a href="https://clavorecords.com" target="_blank" rel="noopener">clavorecords.com</a>
+</footer>
 
 <script>
 /* ============================================================
-   CONFIG
-   COUNT  = cuántas celdas (100).
-   POOL   = IDs de video embebibles; se ciclan para llenar COUNT.
-            Reemplaza por tus IDs (parte después de "watch?v=").
+   1) NOTICIAS  —  carga /api/news (Cloudflare Function) y pinta cards
+   ============================================================ */
+const newsGrid = document.getElementById("news-grid");
+const newsMeta = document.getElementById("news-meta");
+
+function tiempoRelativo(iso) {
+  if (!iso) return "";
+  const diff = Date.now() - new Date(iso).getTime();
+  if (isNaN(diff)) return "";
+  const min = Math.round(diff / 60000);
+  if (min < 1) return "ahora";
+  if (min < 60) return `hace ${min} min`;
+  const h = Math.round(min / 60);
+  if (h < 24) return `hace ${h} h`;
+  const d = Math.round(h / 24);
+  return d === 1 ? "ayer" : `hace ${d} días`;
+}
+
+function esc(s) {
+  return (s || "").replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function renderSkeleton(n = 8) {
+  newsGrid.innerHTML = Array.from({ length: n }, () =>
+    `<div class="card skel">
+       <div class="thumb"></div>
+       <div class="body">
+         <div class="ln short"></div><div class="ln"></div><div class="ln"></div>
+       </div>
+     </div>`).join("");
+}
+
+function renderNews(items) {
+  if (!items || !items.length) {
+    newsGrid.innerHTML = `<div class="empty">Sin titulares por ahora. Vuelve en un rato.</div>`;
+    return;
+  }
+  newsGrid.innerHTML = items.map((it) => {
+    const thumb = it.image
+      ? `<img src="${esc(it.image)}" alt="" loading="lazy"
+              onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ph',textContent:'CLAVO'}))" />`
+      : `<div class="ph">CLAVO</div>`;
+    return `<a class="card" href="${esc(it.url)}" target="_blank" rel="noopener">
+        <div class="thumb">${thumb}</div>
+        <div class="body">
+          <div class="kicker">
+            <span>${esc(it.source)}</span>
+            <span class="dot"></span>
+            <span class="time">${esc(tiempoRelativo(it.date))}</span>
+          </div>
+          <h3>${esc(it.title)}</h3>
+        </div>
+      </a>`;
+  }).join("");
+}
+
+async function loadNews() {
+  renderSkeleton();
+  try {
+    const r = await fetch("/api/news", { headers: { Accept: "application/json" } });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const data = await r.json();
+    renderNews(data.items);
+    if (data.items && data.items.length) {
+      newsMeta.textContent = `${data.items.length} titulares · ${tiempoRelativo(data.updated)}`;
+    }
+  } catch (e) {
+    renderNews([]); // estado vacío, nunca error roto
+  }
+}
+loadNews();
+
+/* ============================================================
+   2) VIDEO WALL  —  20 reproductores YouTube, autoplay muteado
    ============================================================ */
 const COUNT = 20;
 const POOL = [
@@ -130,13 +302,10 @@ const POOL = [
 ];
 const VIDEO_IDS = Array.from({ length: COUNT }, (_, i) => POOL[i % POOL.length]);
 
-const players = [];     // instancias YT.Player
-let apiReady = false;
-
+const players = [];
 const $ = (id) => document.getElementById(id);
 const setStatus = (t) => { $("status").textContent = t; };
 
-/* Construir el grid de 20 celdas con un <div> por player */
 const grid = $("grid");
 VIDEO_IDS.forEach((_, i) => {
   const cell = document.createElement("div");
@@ -146,44 +315,29 @@ VIDEO_IDS.forEach((_, i) => {
   grid.appendChild(cell);
 });
 
-/* Cargar la IFrame Player API de YouTube */
 const tag = document.createElement("script");
 tag.src = "https://www.youtube.com/iframe_api";
 document.head.appendChild(tag);
 
-/* Callback global que YouTube invoca cuando la API está lista */
 window.onYouTubeIframeAPIReady = function () {
-  apiReady = true;
   setStatus("Creando reproductores…");
-
   VIDEO_IDS.forEach((id, i) => {
     players[i] = new YT.Player(`player-${i}`, {
       videoId: id,
       playerVars: {
-        autoplay: 1,        // auto-reproduce al cargar (solo funciona muteado)
-        mute: 1,            // muteado: requisito del navegador para autoplay
-        controls: 1,
-        rel: 0,
-        playsinline: 1,
-        modestbranding: 1
+        autoplay: 1, mute: 1, controls: 1, rel: 0, playsinline: 1, modestbranding: 1
       },
-      events: {
-        // refuerzo: si autoplay no dispara, forzamos play al estar listo
-        onReady: (e) => { e.target.mute(); e.target.playVideo(); }
-      }
+      events: { onReady: (e) => { e.target.mute(); e.target.playVideo(); } }
     });
   });
-
   setStatus("Auto-reproduciendo (muteado)");
   ["btnStart", "btnPause", "btnMute", "btnUnmute"].forEach((b) => ($(b).disabled = false));
 };
 
-/* Helper: aplicar acción a todos los players que ya estén listos */
 function forEachPlayer(fn) {
   players.forEach((p) => { if (p && typeof p.playVideo === "function") fn(p); });
 }
 
-/* Un click dispara los 100, escalonados ~40ms para no saturar de golpe */
 $("btnStart").addEventListener("click", () => {
   setStatus("Iniciando…");
   players.forEach((p, i) => {
@@ -192,21 +346,10 @@ $("btnStart").addEventListener("click", () => {
   });
   setTimeout(() => setStatus("Reproduciendo (muteado)"), players.length * 40);
 });
-
-$("btnPause").addEventListener("click", () => {
-  forEachPlayer((p) => p.pauseVideo());
-  setStatus("Pausado");
-});
-
-$("btnMute").addEventListener("click", () => {
-  forEachPlayer((p) => p.mute());
-  setStatus("Silenciado");
-});
-
-/* Sonido en TODOS suena horrible; quita el comentario si lo quieres así.
-   Por defecto: activa sonido solo en el primer player (el activo). */
+$("btnPause").addEventListener("click", () => { forEachPlayer((p) => p.pauseVideo()); setStatus("Pausado"); });
+$("btnMute").addEventListener("click", () => { forEachPlayer((p) => p.mute()); setStatus("Silenciado"); });
 $("btnUnmute").addEventListener("click", () => {
-  forEachPlayer((p) => p.mute());          // resto en silencio
+  forEachPlayer((p) => p.mute());
   if (players[0]) { players[0].unMute(); players[0].setVolume(100); }
   setStatus("Sonido en video 01");
 });
