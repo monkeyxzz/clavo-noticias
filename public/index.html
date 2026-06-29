@@ -364,9 +364,8 @@ $("btnStart").addEventListener("click", () => {
 $("btnPause").addEventListener("click", () => { forEachPlayer((p) => p.pauseVideo()); setStatus("Pausado"); });
 $("btnMute").addEventListener("click", () => { forEachPlayer((p) => p.mute()); setStatus("Silenciado"); });
 $("btnUnmute").addEventListener("click", () => {
-  forEachPlayer((p) => p.mute());
-  if (players[0]) { players[0].unMute(); players[0].setVolume(100); }
-  setStatus("Sonido en video 01");
+  forEachPlayer((p) => { p.unMute(); p.setVolume(100); });
+  setStatus("Sonido en todos");
 });
 
 initWall();   // arranca: resuelve top RD → construye grid → carga la IFrame API
