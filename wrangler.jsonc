@@ -6,5 +6,8 @@
   "assets": {
     "directory": "./public",
     "binding": "ASSETS"
-  }
+  },
+  "routes": [
+    { "pattern": "noticias.clavorecords.com", "custom_domain": true }
+  ]
 }
